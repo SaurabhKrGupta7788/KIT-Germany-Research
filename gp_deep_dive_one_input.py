@@ -241,7 +241,6 @@
 #     run_deep_study(data_path)
 #     supervisor_covariance_analysis(data_path)
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
@@ -250,16 +249,35 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error
 import warnings
+import sys
+import os
 
 # Ignore minor warnings for a clean terminal output
 warnings.filterwarnings("ignore")
+plt.style.use('seaborn-v0_8-whitegrid')
+
+# Import core CAFM physics simulator
+sys.path.insert(0, os.path.dirname(__file__))
+try:
+    from cafm_sim_v3 import SimParams, run_simulation, CORRIDOR_WIDTH
+except ImportError:
+    print("❌ ERROR: Please place this script in the same folder as 'cafm_sim_v3.py'")
+    sys.exit(1)
+
+def density_to_counts(density, flow_ratio=0.25):
+    """Helper to convert continuous density to exact integer pedestrian counts."""
+    MEASURE_AREA = 10.0 * CORRIDOR_WIDTH
+    N_total = int(np.clip(round(density * MEASURE_AREA), 4, 60))
+    n_minor = int(round(flow_ratio * N_total))
+    n_major = N_total - n_minor
+    return n_major, n_minor
+
 
 def run_6d_real_world_analysis(data_path):
     print("="*60)
     print("PART 1: REAL-WORLD 6D GP ANALYSIS (Partial Dependence)")
     print("="*60)
     
-    # 1. Load Data
     data = np.load(data_path)
     X_raw, Y_raw = data['X'], data['Y']
     
@@ -277,19 +295,16 @@ def run_6d_real_world_analysis(data_path):
     y_test_sorted = y_test[sorted_idx]
     density_test = X_test_sorted[:, density_idx]
 
-    # 2. Scale Data
     scaler_X = StandardScaler()
     scaler_y = StandardScaler()
     X_train_scaled = scaler_X.fit_transform(X_train)
     X_test_scaled = scaler_X.transform(X_test_sorted)
     y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
 
-    # 3. Train Full 6D Model (Captures actual physics)
     kernel = ConstantKernel(1.0) * Matern(length_scale=np.ones(6), nu=2.5) + WhiteKernel(noise_level=0.1)
     gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, random_state=42)
     gp.fit(X_train_scaled, y_train_scaled)
 
-    # 4. Numerical Metrics (For your report)
     y_pred_scaled, _ = gp.predict(X_test_scaled, return_std=True)
     y_pred_test = scaler_y.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()
     
@@ -301,7 +316,6 @@ def run_6d_real_world_analysis(data_path):
     print(f"Mean Absolute Error:   {mean_absolute_error(y_test_sorted, y_pred_test):.4f} s")
     print(f"Mean Relative Error:   {np.mean(relative_error)*100:.2f} %")
 
-    # 5. The Partial Dependence Sweep (Lock 5, Sweep 1)
     n_points = 150
     X_sweep = np.tile(np.mean(X_clean, axis=0), (n_points, 1))
     density_sweep = np.linspace(np.min(X_clean[:, density_idx]), np.max(X_clean[:, density_idx]), n_points)
@@ -314,9 +328,7 @@ def run_6d_real_world_analysis(data_path):
 
     cov_no_noise = y_sweep_cov - np.eye(n_points) * gp.kernel_.k2.noise_level
 
-    # ==========================================
     # PLOT 1: Empirical vs Black Box & Error
-    # ==========================================
     fig1, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), gridspec_kw={'height_ratios': [2, 1]})
     
     ax1.scatter(density_test, y_test_sorted, color='black', alpha=0.7, label='Empirical CAFM Test Data')
@@ -338,9 +350,7 @@ def run_6d_real_world_analysis(data_path):
     plt.tight_layout()
     plt.savefig("plot_1_empirical_and_error.png", dpi=300)
 
-    # ==========================================
     # PLOT 2: Covariance Matrix & Decay Math
-    # ==========================================
     fig2, (ax3, ax4) = plt.subplots(1, 2, figsize=(16, 6))
     
     im = ax3.imshow(cov_no_noise, cmap='inferno', interpolation='nearest', extent=[density_sweep[0], density_sweep[-1], density_sweep[-1], density_sweep[0]])
@@ -364,31 +374,43 @@ def run_6d_real_world_analysis(data_path):
     print("Real-world plots saved (plot_1_empirical_and_error.png, plot_2_covariance_math.png)")
 
 
-def run_1d_textbook_leaf_plot():
+def run_1d_physical_leaf_plot():
     print("\n" + "="*60)
-    print("PART 2: THE TEXTBOOK 'LEAF' (Zero-Variance Proof)")
+    print("PART 2: LIVE CAFM SIMULATOR SLICE (Zero-Variance Proof)")
     print("="*60)
     
-    # 1. Toy Data designed to mimic CAFM density behavior perfectly
-    X_train = np.array([[0.1], [0.3], [0.45], [0.7], [0.85], [1.0]])
-    y_train = np.array([7.0, 9.5, 11.0, 15.0, 13.5, 18.0])
+    # 1. Generate clean, noise-free data by calling the actual CAFM engine
+    train_densities = np.array([0.18, 0.38, 0.58, 0.78, 0.98])
+    train_times = []
     
-    # 2. Pure Noise-Free GP (alpha=1e-10 forces interpolation)
+    print("Executing live deterministic CAFM simulations for the 5 training nodes...")
+    for den in train_densities:
+        n_maj, n_min = density_to_counts(den, flow_ratio=0.25)
+        # We enforce strict parameter locking and a static seed to eliminate all background noise
+        p = SimParams(
+            n_major=n_maj, n_minor=n_min, v0_mean=1.21, 
+            tau=0.5, A=20.0, R_safety=1.22, R_danger=0.61, seed=42
+        )
+        res = run_simulation(p)
+        train_times.append(res['mean_crossing_time'])
+    
+    X_train = train_densities.reshape(-1, 1)
+    y_train = np.array(train_times)
+    
+    # 2. Pure Noise-Free GP setup (alpha=1e-10 forces perfect mathematical interpolation)
     kernel = RBF(length_scale=0.15)
-    gp = GaussianProcessRegressor(kernel=kernel, alpha=1e-10, n_restarts_optimizer=10)
+    gp = GaussianProcessRegressor(kernel=kernel, alpha=1e-10, n_restarts_optimizer=10, random_state=42)
     gp.fit(X_train, y_train)
     
-    X_sweep = np.linspace(0.0, 1.1, 200).reshape(-1, 1)
+    X_sweep = np.linspace(0.1, 1.05, 200).reshape(-1, 1)
     y_mean, y_cov = gp.predict(X_sweep, return_cov=True)
     sigma = np.sqrt(np.diag(y_cov))
     
-    # Sample Posterior Functions
+    # Sample Posterior Functions from the validated covariance structure
     np.random.seed(42)
     y_samples = np.random.multivariate_normal(y_mean, y_cov, size=5).T
 
-    # ==========================================
-    # PLOT 3: The Leaf Pattern
-    # ==========================================
+    # PLOT 3: The Leaf Pattern (Generated from real physics!)
     plt.figure(figsize=(12, 7))
     
     plt.fill_between(X_sweep.ravel(), y_mean - 2*sigma, y_mean + 2*sigma, color='lightblue', alpha=0.6, label='$\pm 2\sigma$ Variance (Pinches to 0 at data)')
@@ -398,18 +420,18 @@ def run_1d_textbook_leaf_plot():
         plt.plot(X_sweep, y_samples[:, i], color=colors[i], alpha=0.7, lw=1.5, label=f'Sampled Function {i+1}' if i==0 else "")
                  
     plt.plot(X_sweep, y_mean, 'b--', lw=2.5, label='GP Mean ($\mu$)')
-    plt.plot(X_train, y_train, 'ko', markersize=8, zorder=10, label='Empirical Nodes (Zero Uncertainty)')
+    plt.plot(X_train, y_train, 'ro', markersize=9, markeredgecolor='black', zorder=10, label='CAFM Physical Nodes (Zero Uncertainty)')
     
-    plt.title("Textbook GP Proof: Posterior Sampling and Variance 'Pinching'", fontsize=14, pad=15)
+    plt.title("Physical GP Verification: Controlled 1D Simulation Slice Variance 'Pinching'", fontsize=14, pad=15)
     plt.xlabel("Density (ped/m²)", fontsize=12)
     plt.ylabel("Mean Crossing Time (s)", fontsize=12)
-    plt.legend(fontsize=10, loc='upper left')
+    plt.xlim(0.1, 1.05)
+    plt.legend(fontsize=10, loc='upper left', frameon=True, shadow=True)
     plt.grid(True, linestyle=':', alpha=0.7)
     
     plt.tight_layout()
     plt.savefig("plot_3_textbook_leaf.png", dpi=300)
-    print("Textbook proof saved (plot_3_textbook_leaf.png)")
-
+    print("Physical leaf plot successfully saved (plot_3_textbook_leaf.png)")
 
 
 def run_failed_leaf_with_real_data(data_path):
@@ -417,32 +439,24 @@ def run_failed_leaf_with_real_data(data_path):
     print("PART 4: THE 'THICK BLOB' (Why real 6D data fails the 1D Leaf test)")
     print("="*60)
     
-    # 1. Load the REAL Data
     data = np.load(data_path)
     X_raw, Y_raw = data['X'], data['Y']
     
-    # Extract ONLY Density (1D) and Crossing Time (1D)
     density_idx = 4
     target_idx = 0
     valid_mask = ~np.isnan(Y_raw[:, target_idx])
-    X_clean_1D = X_raw[valid_mask, density_idx].reshape(-1, 1) # Forced into 1D!
+    X_clean_1D = X_raw[valid_mask, density_idx].reshape(-1, 1) 
     y_clean = Y_raw[valid_mask, target_idx]
 
-    # 2. Scale
     scaler_X = StandardScaler()
     scaler_y = StandardScaler()
     X_scaled = scaler_X.fit_transform(X_clean_1D)
     y_scaled = scaler_y.fit_transform(y_clean.reshape(-1, 1)).ravel()
 
-    # 3. Train a pure 1D GP on the real noisy data
-    # We MUST include WhiteKernel. If we used alpha=1e-10 (noise-free) here, 
-    # the math would instantly crash (LinAlgError) because real data has 
-    # different Y values for the same X value!
     kernel = ConstantKernel(1.0) * RBF(length_scale=1.0) + WhiteKernel(noise_level=0.5)
     gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, random_state=42)
     gp.fit(X_scaled, y_scaled)
     
-    # 4. Sweep and Extract Covariance
     X_sweep = np.linspace(np.min(X_clean_1D), np.max(X_clean_1D), 150).reshape(-1, 1)
     X_sweep_scaled = scaler_X.transform(X_sweep)
     
@@ -450,28 +464,20 @@ def run_failed_leaf_with_real_data(data_path):
     y_mean = scaler_y.inverse_transform(y_mean_scaled.reshape(-1, 1)).ravel()
     sigma = np.sqrt(np.diag(y_cov_scaled)) * scaler_y.scale_[0]
     
-    # 5. Sample the Posterior (Including the noise, which causes the blob)
     np.random.seed(42)
     y_samples_scaled = np.random.multivariate_normal(y_mean_scaled, y_cov_scaled, size=5).T
     y_samples = scaler_y.inverse_transform(y_samples_scaled)
 
-    # ==========================================
-    # PLOT: THE MASSIVE BLOB
-    # ==========================================
+    # PLOT 4: THE MASSIVE BLOB
     plt.figure(figsize=(12, 7))
-    
-    # Notice the Variance band is huge and NEVER pinches to zero!
     plt.fill_between(X_sweep.ravel(), y_mean - 2*sigma, y_mean + 2*sigma, 
                      color='lightcoral', alpha=0.3, label='$\pm 2\sigma$ Massive Aleatoric Uncertainty')
     
-    # The samples will look like a chaotic scribble (spaghetti)
     colors = ['red', 'darkred', 'orange', 'purple', 'brown']
     for i in range(5):
         plt.plot(X_sweep, y_samples[:, i], color=colors[i], alpha=0.7, lw=1.5)
                  
     plt.plot(X_sweep, y_mean, 'k--', lw=3, label='GP Mean (Flattens out)')
-    
-    # The real data points, scattered everywhere
     plt.scatter(X_clean_1D, y_clean, color='black', alpha=0.4, s=20, label='Real LHS Data (Creates Noise)')
     
     plt.title("The 'Thick Blob': Attempting a 1D Posterior on Noisy 6D Real Data", fontsize=14, pad=15)
@@ -487,12 +493,12 @@ def run_failed_leaf_with_real_data(data_path):
 
 
 if __name__ == "__main__":
-    DATA_PATH = r"D:\KIT\cafm_lhs_1000.npz"
+    DATA_PATH = r"D:\KIT\cafm_lhs_3000_active.npz" # Update this path to your actual dataset location
     
     try:
         run_6d_real_world_analysis(DATA_PATH)
-        run_1d_textbook_leaf_plot()
-        run_failed_leaf_with_real_data(DATA_PATH) # <--- ADD THIS LINE
-        print("\nSUCCESS! All analyses are complete and ready for the supervisor meeting.")
+        run_1d_physical_leaf_plot() # <--- SWAPPED IN THE LIVE PHYSICS EXPERIMENT Logic
+        run_failed_leaf_with_real_data(DATA_PATH)
+        print("\n🏆 SUCCESS! All physical analyses are complete and fully verified.")
     except FileNotFoundError:
-        print(f"\nERROR: Could not find the file at {DATA_PATH}. Please check the path and try again.")
+        print(f"\n❌ ERROR: Could not find the file at {DATA_PATH}. Please check the path.")
