@@ -1,0 +1,2 @@
+Method,Final Data Size,Final R²,Final RMSE,R² Improvement,RMSE Improvement,Total Search (s),Total Sim (s),Total Fit (s),Total Time (s),Avg Search/Iter,Boundary Points,Interior Points,Boundary %
+M2: Multi-Start (AL),163,0.8599,1.0355,+0.1099,+0.3477,5.0,3048.1,1.5,3054.7,1.67,60,0,100.0%

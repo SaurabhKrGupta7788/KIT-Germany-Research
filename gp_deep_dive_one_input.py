@@ -324,8 +324,9 @@ def run_6d_real_world_analysis(data_path):
     X_sweep_scaled = scaler_X.transform(X_sweep)
     y_sweep_scaled, y_sweep_cov = gp.predict(X_sweep_scaled, return_cov=True)
     y_sweep_mean = scaler_y.inverse_transform(y_sweep_scaled.reshape(-1, 1)).ravel()
-    sigma_sweep = np.sqrt(np.diag(y_sweep_cov)) * scaler_y.scale_[0]
 
+    sigma_sweep = np.sqrt(np.diag(y_sweep_cov)) * scaler_y.scale_[0]
+    
     cov_no_noise = y_sweep_cov - np.eye(n_points) * gp.kernel_.k2.noise_level
 
     # PLOT 1: Empirical vs Black Box & Error
@@ -493,7 +494,7 @@ def run_failed_leaf_with_real_data(data_path):
 
 
 if __name__ == "__main__":
-    DATA_PATH = r"D:\KIT\cafm_lhs_3000_active.npz" # Update this path to your actual dataset location
+    DATA_PATH = r"D:\KIT\cafm_lhs_300.npz" # Update this path to your actual dataset location
     
     try:
         run_6d_real_world_analysis(DATA_PATH)

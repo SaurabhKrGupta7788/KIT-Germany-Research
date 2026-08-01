@@ -1,0 +1,32 @@
+. : File C:\Users\100ra\Documents\WindowsPowerShell\profile.ps1 cannot be loaded because running scripts is disabled 
+on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+At line:1 char:3
++ . 'C:\Users\100ra\Documents\WindowsPowerShell\profile.ps1'
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+Verifying presentation HTML at: D:\KIT\html_presentation\index.html
+Found 15 slides defined in JS.
+HTML syntax is sound. Found 0 referenced assets.
+Checking for inline image/video asset references in JS...
+Found inline reference: images/gp_fitting.mp4 -> D:\KIT\html_presentation\images\gp_fitting.mp4
+  [PASS] Inline referenced file exists and is non-empty (140058 bytes).
+Found inline reference: images/cafm_poster.png -> D:\KIT\html_presentation\images\cafm_poster.png
+  [PASS] Inline referenced file exists and is non-empty (7443 bytes).
+Found inline reference: images/sklearn_ard_mean_crossing_time.png -> D:\KIT\html_presentation\images\sklearn_ard_mean_crossing_time.png
+  [PASS] Inline referenced file exists and is non-empty (140995 bytes).
+Found inline reference: images/sklearn_partial_dependence_mean_crossing_time.png -> D:\KIT\html_presentation\images\sklearn_partial_dependence_mean_crossing_time.png
+  [PASS] Inline referenced file exists and is non-empty (672531 bytes).
+Found inline reference: images/cafm_simulation.mp4 -> D:\KIT\html_presentation\images\cafm_simulation.mp4
+  [PASS] Inline referenced file exists and is non-empty (48804 bytes).
+Found inline reference: images/sklearn_parity_mean_crossing_time.png -> D:\KIT\html_presentation\images\sklearn_parity_mean_crossing_time.png
+  [PASS] Inline referenced file exists and is non-empty (196710 bytes).
+Found inline reference: images/uncertainty_heatmap_mean_crossing_time.png -> D:\KIT\html_presentation\images\uncertainty_heatmap_mean_crossing_time.png
+  [PASS] Inline referenced file exists and is non-empty (303904 bytes).
+Found inline reference: images/gp_poster.png -> D:\KIT\html_presentation\images\gp_poster.png
+  [PASS] Inline referenced file exists and is non-empty (24074 bytes).
+Found inline reference: images/sklearn_residuals_mean_crossing_time.png -> D:\KIT\html_presentation\images\sklearn_residuals_mean_crossing_time.png
+  [PASS] Inline referenced file exists and is non-empty (160823 bytes).
+Found inline reference: images/ultimate_3way_al_comparison.png -> D:\KIT\html_presentation\images\ultimate_3way_al_comparison.png
+  [PASS] Inline referenced file exists and is non-empty (473390 bytes).
+Verification PASSED! All local assets are present, valid, non-empty, and HTML/JS is sound.

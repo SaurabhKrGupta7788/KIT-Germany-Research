@@ -82,53 +82,107 @@ def density_to_counts(density, flow_ratio):
     return n_major, n_minor
 
 
-def lhs_sample(n_samples: int, seed: int = 0) -> np.ndarray:
-    """
-    Generate n_samples × 6 LHS design matrix, scaled to parameter bounds.
-    Uses scipy LatinHypercube with strength=2 for better space-filling.
-    Returns array shape (n_samples, 6).
-    """
-    sampler = qmc.LatinHypercube(d=len(PARAM_NAMES), strength=1, seed=seed)
-    unit    = sampler.random(n_samples)          # (N, 6) in [0,1]
+# def lhs_sample(n_samples: int, seed: int = 0) -> np.ndarray:
+#     """
+#     Generate n_samples × 6 LHS design matrix, scaled to parameter bounds.
+#     Uses scipy LatinHypercube with strength=2 for better space-filling.
+#     Returns array shape (n_samples, 6).
+#     """
+#     sampler = qmc.LatinHypercube(d=len(PARAM_NAMES), strength=1, seed=seed)
+#     unit    = sampler.random(n_samples)          # (N, 6) in [0,1]
 
-    # scale each column to its physical range
+#     # scale each column to its physical range
+#     lowers = np.array([PARAM_BOUNDS[k][0] for k in PARAM_NAMES])
+#     uppers = np.array([PARAM_BOUNDS[k][1] for k in PARAM_NAMES])
+#     scaled = qmc.scale(unit, lowers, uppers)
+#     return scaled
+
+
+
+def qmc_sobol_sample(n_samples: int, seed: int = 42) -> np.ndarray:
+    """
+    Generate n_samples × 6 QMC design matrix using a Sobol sequence.
+    Scaled to physical parameter bounds.
+    """
+    # Check if n_samples is a power of 2 (bitwise operation)
+    is_power_of_two = (n_samples != 0) and ((n_samples & (n_samples - 1)) == 0)
+    if not is_power_of_two:
+        print(f"  [WARN] QMC Sobol sequences are optimal only for powers of 2.")
+        print(f"         Consider using 256 or 512 instead of {n_samples} for perfect balance.")
+
+    # Initialize Sobol sampler. scramble=True adds random shifts while preserving uniformity
+    sampler = qmc.Sobol(d=len(PARAM_NAMES), scramble=True, seed=seed)
+    
+    # Generate raw unit samples in [0,1)
+    unit = sampler.random(n_samples)
+
+    # Scale each column to its physical range
     lowers = np.array([PARAM_BOUNDS[k][0] for k in PARAM_NAMES])
     uppers = np.array([PARAM_BOUNDS[k][1] for k in PARAM_NAMES])
     scaled = qmc.scale(unit, lowers, uppers)
+    
     return scaled
 
 
-def run_lhs_dataset(
-    n_samples   : int  = 300,
-    n_repeats   : int  = 3,      # average over n_repeats runs per LHS point
-    lhs_seed    : int  = 42,
+
+
+
+
+# def run_lhs_dataset(
+#     n_samples   : int  = 300,
+#     n_repeats   : int  = 3,      # average over n_repeats runs per LHS point
+#     lhs_seed    : int  = 42,
+#     base_sim_seed: int = 0,
+#     save_path   : str  = "cafm_lhs_dataset.npz",
+#     verbose     : bool = True,
+# ) -> dict:
+#     """
+#     Generate full LHS dataset.
+
+#     For each LHS point:
+#       - Run n_repeats simulations with different seeds
+#       - Average outputs to reduce stochastic noise
+#       - Store (X_row, y_mean, y_std) in dataset
+
+#     Saves .npz with:
+#       X           : (n_samples, 6)  input parameter matrix
+#       Y           : (n_samples, 4)  mean output matrix
+#       Y_std       : (n_samples, 4)  std over repeats (aleatoric noise estimate)
+#       param_names : list of input names
+#       output_names: list of output names
+#       param_bounds: (2, 6) array [lowers; uppers]
+#     """
+#     X_raw = lhs_sample(n_samples, seed=lhs_seed)  # (N, 6) raw param values
+
+#     Y      = np.zeros((n_samples, len(OUTPUT_NAMES)))
+#     Y_std  = np.zeros((n_samples, len(OUTPUT_NAMES)))
+
+
+###   QMC version with Sobol sampling instead of LHS
+
+def run_qmc_dataset(
+    n_samples   : int  = 256,    # CHANGED: 256 is 2^8, optimal for Sobol
+    n_repeats   : int  = 3,      
+    qmc_seed    : int  = 42,     # Renamed variable
     base_sim_seed: int = 0,
-    save_path   : str  = "cafm_lhs_dataset.npz",
+    save_path   : str  = "cafm_qmc_dataset.npz", # Updated filename
     verbose     : bool = True,
 ) -> dict:
     """
-    Generate full LHS dataset.
-
-    For each LHS point:
-      - Run n_repeats simulations with different seeds
-      - Average outputs to reduce stochastic noise
-      - Store (X_row, y_mean, y_std) in dataset
-
-    Saves .npz with:
-      X           : (n_samples, 6)  input parameter matrix
-      Y           : (n_samples, 4)  mean output matrix
-      Y_std       : (n_samples, 4)  std over repeats (aleatoric noise estimate)
-      param_names : list of input names
-      output_names: list of output names
-      param_bounds: (2, 6) array [lowers; uppers]
+    Generate full QMC dataset using Sobol sequences.
     """
-    X_raw = lhs_sample(n_samples, seed=lhs_seed)  # (N, 6) raw param values
+    # CHANGED: Call the new Sobol function
+    X_raw = qmc_sobol_sample(n_samples, seed=qmc_seed)  
 
     Y      = np.zeros((n_samples, len(OUTPUT_NAMES)))
     Y_std  = np.zeros((n_samples, len(OUTPUT_NAMES)))
 
+
+# till here is mostly the same, except for the sampling method and some variable names. The rest of the function logic remains intact, as it handles the simulation runs and data aggregation in the same way regardless of how the input samples were generated.
+
+
     if verbose:
-        print(f"\nCAFM LHS Dataset Generation")
+        print(f"\nCAFM QMC (Sobol) Dataset Generation") # Updated text
         print(f"  Samples    : {n_samples}")
         print(f"  Repeats    : {n_repeats} per sample")
         print(f"  Total runs : {n_samples * n_repeats}")
@@ -212,14 +266,25 @@ def run_lhs_dataset(
 #  Quick smoke test (10 samples)
 # ─────────────────────────────────────────────
 
+# if __name__ == "__main__":
+#     print("Smoke test: 10 samples × 2 repeats")
+#     data = run_lhs_dataset(
+#         n_samples    = 10,
+#         n_repeats    = 2,
+#         save_path    = "cafm_lhs_smoke.npz",
+#         verbose      = True,
+#     )
+
 if __name__ == "__main__":
-    print("Smoke test: 10 samples × 2 repeats")
-    data = run_lhs_dataset(
-        n_samples    = 10,
+    print("Smoke test: 16 samples × 2 repeats (QMC optimal)")
+    data = run_qmc_dataset(
+        n_samples    = 16,     # CHANGED: 16 instead of 10
         n_repeats    = 2,
-        save_path    = "cafm_lhs_smoke.npz",
+        save_path    = "cafm_qmc_smoke.npz",
         verbose      = True,
     )
+
+    
     print("\nX shape:", data["X"].shape)
     print("Y shape:", data["Y"].shape)
     print("\nFirst 5 rows of X:")

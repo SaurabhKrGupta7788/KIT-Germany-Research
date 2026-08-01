@@ -1,0 +1,6 @@
+Method,Final R²,Total Time (s),Boundary Points,Interior Points
+M0: Random Baseline,0.8137,1661.8,25,35
+M1: Sobol Grid,0.8629,2337.0,60,0
+M2: MultiStart (20),0.8515,1708.9,60,0
+M2: MultiStart (50),0.8599,3054.7,60,0
+M3: K-Means Pool,0.8335,2398.9,18,42

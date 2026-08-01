@@ -591,7 +591,7 @@
                         <p class="slide-subtitle"></p>
                     </div>
                 </div>
-                <div class="slide-number-badge">01 / 18</div>
+                <div class="slide-number-badge">01 / 17</div>
             </div>
 
             <div class="slide-body wide-left">
@@ -601,21 +601,23 @@
                         <div class="scaffold-label">Simplified Motivation & Proposal</div>
                         <div class="scaffold-title">Bridging Microscopic Realism & HPC Intractability</div>
                         <div class="scaffold-text">
-                            <p style="margin-bottom: 8px;"><strong>The Problem:</strong> Agent-based models (SFM/CAFM) are great at simulating realistic crowds, but they are <strong>computationally expensive</strong>. Running them thousands of times for parameter studies is impossible.</p>
-                            <p><strong>Our Solution:</strong> Build a <strong>fast, data-driven surrogate model</strong> (like a Gaussian Process emulator) that learns the mapping from input parameters to crowd behavior. This enables <strong>instant predictions</strong> with <strong>Uncertainty Quantification (UQ)</strong> and <strong>Global Sensitivity Analysis (GSA)</strong>, saving massive amounts of HPC time and resources.</p>
+                            <p style="margin-bottom: 8px;"><strong>The Problem:</strong> Agent-based models (SFM/CAFM) are great at simulating realistic pedestrain, but they are <strong>computationally expensive</strong>. Running them thousands of times for parameter studies is impossible.</p>
+                            <p><strong>Our Solution:</strong> Build a <strong>fast, data-driven surrogate model</strong> (a Gaussian Process) that learns the mapping from input parameters to crowd behavior. This enables <strong>instant predictions</strong> with <strong>Uncertainty Quantification (UQ)</strong> and <strong>Global Sensitivity Analysis (GSA)</strong>, saving massive amounts of HPC time and resources.</p>
                         </div>
                     </div>
 
                     <div class="flow-container">
-                        <div class="flow-node">Dataset Generation<br><small style="color: #64748b;">Systematic Parameter Sweeps</small></div>
+                        <div class="flow-node">Microscopic Models<br><small style="color: #64748b;">SFM & CAFM</small></div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-node">Surrogate Modeling<br><small style="color: #64748b;">(GP)</small></div>
+                        <div class="flow-node">Dataset Generation<br><small style="color: #64748b;"></small></div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-node">Uncertainty Quantification<br><small style="color: #64748b;">MC Dropout & Ensembles</small></div>
+                        <div class="flow-node">Surrogate Modeling<br><small style="color: #64748b;">(Gaussian Process)</small></div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-node">Sensitivity Analysis<br><small style="color: #64748b;">Sobol Indices & SHAP</small></div>
+                        <div class="flow-node">Partial Dependency Analysis<br><small style="color: #64748b;"></small></div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-node">HPC Scalability<br><small style="color: #64748b;">Benchmarking & Speedup</small></div>
+                        <div class="flow-node">Active Learning<br><small style="color: #64748b;">Multiple Approach</small></div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-node">Result Analysis<br><small style="color: #64748b;"></small></div>
                     </div>
                 </div>
 
@@ -728,11 +730,11 @@
                     <img src="images/kit_logo.png" alt="KIT Logo" onerror="this.style.display='none'" style="height:40px;">
                     <div>
                         <div class="tag-badge">Block 1 · 01 — Foundations</div>
-                        <h2 class="slide-title">Microscopic Foundations of Crowd Dynamics</h2>
+                        <h2 class="slide-title">Microscopic Foundations of Pedestrain Dynamics</h2>
                         <p class="slide-subtitle">Understanding the Social Force Model (SFM) — the building block of pedestrian simulation</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">02 / 18</div>
+                <div class="slide-number-badge">02 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -764,12 +766,7 @@
                         </div>
                     </div>
 
-                    <div class="scaffold-card" style="border-left: 4px solid #dc2626;">
-                        <div class="scaffold-label" style="color:#dc2626;">The Fundamental Flaw</div>
-                        <div class="scaffold-text">
-                            <strong>SFM has no "radar" — it only reacts after contact.</strong> Pedestrians cannot see what is coming; they only push back when someone is already too close. This leads to <strong>artificial gridlock</strong> in dense crowds, especially during counter‑flow (people walking in opposite directions).
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <!-- Right: visual -->
@@ -846,7 +843,7 @@
                         <p class="slide-subtitle">Giving pedestrians a "radar: <strong>R_saftey & R_danger</strong>" — proactive steering instead of reactive pushing</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">03 / 18</div>
+                <div class="slide-number-badge">03 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -877,12 +874,7 @@
                         </div>
                     </div>
 
-                    <div class="scaffold-card" style="border-left: 4px solid var(--kit-green);">
-                        <div class="scaffold-label" style="color: var(--kit-green);">The Advantage</div>
-                        <div class="scaffold-text">
-                            <strong>CAFM eliminates the artificial gridlock</strong> seen in SFM. By steering proactively, pedestrians form <strong>self‑organized lanes</strong> in bi‑directional flows, achieving realistic bottleneck throughput without the unrealistic contact forces required by SFM.
-                        </div>
-                    </div>
+                   
                 </div>
 
                 <!-- Right: Simulation Video -->
@@ -898,10 +890,7 @@
                 </div>
             </div>
 
-            <div class="takeaway-banner">
-                <span class="takeaway-label">Key Insight</span>
-                <span class="takeaway-text">CAFM delivers realistic crowd dynamics, but at a high computational cost — which is exactly why we need a surrogate model.</span>
-            </div>
+          
         </section>
 
         <!-- ============================================================
@@ -917,7 +906,7 @@
                         <p class="slide-subtitle">Exhaustive Parameter Exploration of Agent Simulations is Computationally Intractable</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">04 / 18</div>
+                <div class="slide-number-badge">04 / 17</div>
             </div>
 
             <div class="slide-body wide-left">
@@ -934,7 +923,7 @@
                         <p style="font-size: 15px; color: var(--kit-gray-dark); margin-top: 6px;">
                             • 1 CAFM Monte Carlo Ensemble (10 seeds) = <strong>124 seconds</strong><br>
                             • Full Grid Search ($10^6$ evaluation points) = <strong>1,435 CPU Days</strong><br>
-                            • <strong>Conclusion:</strong> Blind passive sampling is impossible on modern supercomputers.
+                            • <strong>Conclusion:</strong> Blind passive sampling is very expensive on modern supercomputers.
                         </p>
                     </div>
 
@@ -988,7 +977,7 @@
                         <p class="slide-subtitle">256 Quasi-Monte Carlo Configurations × 10 Seeds = Ensembled Ground Truth</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">05 / 18</div>
+                <div class="slide-number-badge">05 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1008,10 +997,7 @@
                         </div>
                     </div>
 
-                    <div class="scaffold-card">
-                        <div class="scaffold-label">Heteroscedastic Integration</div>
-                        <div class="scaffold-text">Injected empirical seed variance $\alpha_i = (\sigma_{n,i} / \text{scale}_y)^2$ directly into the diagonal Gaussian Process noise matrix $\mathbf{K} + \text{diag}(\boldsymbol{\alpha})$.</div>
-                    </div>
+                   
                 </div>
 
                 <div class="visual-frame" style="padding: 24px;">
@@ -1076,7 +1062,7 @@
                         <p class="slide-subtitle">Physical Parameter Bounds & Target Macroscopic Response Variables</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">06 / 18</div>
+                <div class="slide-number-badge">06 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1161,7 +1147,7 @@
                         <p class="slide-subtitle">Analytical Bayesian Posterior Mean & Epistemic Uncertainty Quantification</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">07 / 18</div>
+                <div class="slide-number-badge">07 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1199,10 +1185,7 @@
                 </div>
             </div>
 
-            <div class="takeaway-banner">
-                <span class="takeaway-label">Key Insight</span>
-                <span class="takeaway-text">GP surrogates provide exact analytical predictions and formal variance metrics without requiring expensive Monte Carlo dropout approximations.</span>
-            </div>
+            
         </section>
 
         <!-- ============================================================
@@ -1218,7 +1201,7 @@
                 <p class="slide-subtitle">How the GP measures "similarity" between points in 6D space</p>
             </div>
         </div>
-        <div class="slide-number-badge">08 / 18</div>
+        <div class="slide-number-badge">08 / 17</div>
     </div>
 
     <div class="slide-body">
@@ -1302,7 +1285,7 @@
                 <p class="slide-subtitle">Isolating the effect of density on Mean Crossing Time</p>
             </div>
         </div>
-        <div class="slide-number-badge">09 / 18</div>
+        <div class="slide-number-badge">09 / 17</div>
     </div>
 
     <div class="slide-body wide-right">
@@ -1350,69 +1333,7 @@
     </div>
 </section>
 
-<!-- ============================================================
-     SLIDE 10: ARD SENSITIVITY ANALYSIS
-     ============================================================ -->
-<section class="slide" id="slide-10">
-    <div class="slide-header">
-        <div class="header-left">
-            <img src="images/kit_logo.png" alt="KIT Logo" onerror="this.style.display='none'" style="height:40px;">
-            <div>
-                <div class="tag-badge">Physical Insights · 02</div>
-                <h2 class="slide-title">ARD Sensitivity Analysis</h2>
-                <p class="slide-subtitle">Automatic Relevance Determination — which parameters actually matter?</p>
-            </div>
-        </div>
-        <div class="slide-number-badge">10 / 18</div>
-    </div>
-
-    <div class="slide-body wide-right">
-        <!-- Left: Explanation -->
-        <div>
-            <div class="scaffold-card">
-                <div class="scaffold-label">What is ARD?</div>
-                <div class="scaffold-text">
-                    Automatic Relevance Determination learns a <strong>separate length-scale $l_i$ per dimension</strong> during GP training. Short $l_i$ = high sensitivity; long $l_i$ = nearly irrelevant.
-                    <div class="eq-box">
-                        $$d^2(\mathbf{x},\mathbf{x}') = \sum_{i=1}^{6} \frac{(x_i-x_i')^2}{l_i^2}$$
-                    </div>
-                </div>
-            </div>
-
-            <div class="scaffold-card">
-                <div class="scaffold-label">Key Findings from the Plot</div>
-                <div class="scaffold-text">
-                    • <strong>density ($l=0.30$):</strong> Most influential — small changes cause large effects.<br>
-                    • <strong>flow_ratio ($l=0.49$), v0_mean ($l=0.50$):</strong> Moderate sensitivity.<br>
-                    • <strong>A ($l=1.00$):</strong> Least influential — repulsion strength is smoothed out in congested regimes.
-                </div>
-            </div>
-
-            <div class="scaffold-card" style="border-left: 4px solid var(--kit-green);">
-                <div class="scaffold-label" style="color: var(--kit-green);">Scientific Conclusion</div>
-                <div class="scaffold-text">
-                    <strong>Density and flow ratio</strong> are the primary controls. Microscopic parameters like repulsion strength $A$ and relaxation time $\tau$ are <strong>less critical</strong> in dense, congested corridors.
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: ARD Plot -->
-        <div class="visual-frame" style="padding: 10px; background: #ffffff;">
-            <!-- The ARD_Analysis.png plot is displayed here -->
-            <img src="images/ARD_Analysis.png" alt="ARD Sensitivity Analysis" style="width:100%; height:100%; object-fit:contain; border-radius: 6px;">
-            <div class="visual-caption">
-                <span>ARD Length Scales ($l_i$) — Inverted length $\propto$ parameter sensitivity</span>
-                <span>density: 0.30 (highest) • A: 1.00 (lowest)</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="takeaway-banner">
-        <span class="takeaway-label">Key Insight</span>
-        <span class="takeaway-text">Density and flow ratio dominate crowd dynamics — microscopic parameters are secondary in congested regimes.</span>
-    </div>
-</section>
-
+<
         <!-- ============================================================
              SLIDE 11: WHY ACTIVE LEARNING? (AL LOOP WORKFLOW)
              ============================================================ -->
@@ -1426,7 +1347,7 @@
                         <p class="slide-subtitle">Iterative Bayesian Optimization Workflow for Autonomous Simulation Control</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">11 / 18</div>
+                <div class="slide-number-badge">10 / 17</div>
             </div>
 
             <div class="slide-body wide-left">
@@ -1500,7 +1421,7 @@
                         <p class="slide-subtitle">10 Distinct Acquisition Philosophies Evaluated in this Research</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">12 / 18</div>
+                <div class="slide-number-badge">11 / 17</div>
             </div>
 
             <div class="slide-body full-width">
@@ -1585,7 +1506,7 @@
                         <p class="slide-subtitle">4-Axis Weighted Scoring Combining Accuracy, Efficiency, Exploration & Runtime</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">13 / 18</div>
+                <div class="slide-number-badge">12 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1604,7 +1525,7 @@
                         <div class="scaffold-label">Four Evaluation Axes</div>
                         <div class="scaffold-text">
                             • <strong>1. Prediction (50%):</strong> Surrogate accuracy ($R^2$ & RMSE).<br>
-                            • <strong>2. Efficiency (20%):</strong> Variance reduction speed per simulation second.<br>
+                            • <strong>2. Efficiency (20%):</strong> Variance reduction per simulation (($\Delta R^2$ Gain X 1000)/sim. min).<br>
                             • <strong>3. Exploration (15%):</strong> Boundary % vs Interior hypercube coverage.<br>
                             • <strong>4. Runtime (15%):</strong> Candidate search computational cost.
                         </div>
@@ -1647,58 +1568,10 @@
             </div>
         </section>
 
-        <!-- ============================================================
-             SLIDE 14: EXPLORATION BEHAVIOUR & COVERAGE
-             ============================================================ -->
-        <section class="slide" id="slide-14">
-            <div class="slide-header">
-                <div class="header-left">
-                    <img src="images/kit_logo.png" alt="KIT Logo" onerror="this.style.display='none'" style="height:40px;">
-                    <div>
-                        <div class="tag-badge">Space-Filling Dynamics</div>
-                        <h2 class="slide-title">Exploration Behaviour & Hypercube Coverage</h2>
-                        <p class="slide-subtitle">Spatial Distribution of Acquired Samples Across Parameter Sub-Planes</p>
-                    </div>
-                </div>
-                <div class="slide-number-badge">14 / 18</div>
-            </div>
-
-            <div class="slide-body">
-                <div>
-                    <div class="scaffold-card">
-                        <div class="scaffold-label">Exploration Profiling</div>
-                        <div class="scaffold-text">
-                            Analyzing sample placement in 2D projections ($v_{0,\text{mean}}$ vs $\text{density}$) reveals fundamental structural differences in how each strategy explores the 6D space.
-                        </div>
-                    </div>
-
-                    <div class="scaffold-card">
-                        <div class="scaffold-label">Structural Findings</div>
-                        <div class="scaffold-text">
-                            <strong>Sobol Grid (M1):</strong> Fills interior hypercube volume evenly, ensuring broad coverage but missing extreme boundaries.<br>
-                            <strong>MultiStart (M2):</strong> Concentrates heavily along parameter boundaries where variance derivative $\nabla \sigma^2(x)$ vanishes, leading to high boundary %.<br>
-                            <strong>Hybrid (M2 Hybrid):</strong> Balances interior sampling with corner stress-testing, achieving the best of both worlds.
-                        </div>
-                    </div>
-                </div>
-
-                <div class="visual-frame">
-                    <img src="images/ALL_points_boundary_heatmap.png" alt="Boundary Heatmap" style="width:100%; height:100%; object-fit:contain;">
-                    <div class="visual-caption">
-                        <span>Boundary vs Interior Sampling Heatmap</span>
-                        <span>Hybrid strategies achieve balanced coverage</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="takeaway-banner">
-                <span class="takeaway-label">Key Insight</span>
-                <span class="takeaway-text">Acquisition strategy choice dictates dataset topology, impacting whether the surrogate learns general dynamics or boundary limits.</span>
-            </div>
-        </section>
+        
 
         <!-- ============================================================
-             SLIDE 15: BENCHMARK RESULTS
+             SLIDE 14: BENCHMARK RESULTS
              ============================================================ -->
         <section class="slide" id="slide-15">
             <div class="slide-header">
@@ -1710,7 +1583,7 @@
                         <p class="slide-subtitle">Consolidated Performance Breakdown Across Prediction, Efficiency, and Exploration</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">15 / 18</div>
+                <div class="slide-number-badge">13 / 17</div>
             </div>
 
             <div class="slide-body full-width">
@@ -1750,13 +1623,13 @@
         </section>
 
         <!-- ============================================================
-             SLIDE 16: ACTIVE LEARNING DASHBOARD
+             SLIDE 15: ACTIVE LEARNING DASHBOARD
              ============================================================ -->
 <!-- ============================================================
-     SLIDE 16: ACTIVE LEARNING DASHBOARD (NO CAPTION, FULL IMAGE)
+     SLIDE 15: ACTIVE LEARNING DASHBOARD (NO CAPTION, FULL IMAGE)
      ============================================================ -->
             <!-- ============================================================
-     SLIDE 16: ACTIVE LEARNING DASHBOARD (15% LARGER)
+     SLIDE 15: ACTIVE LEARNING DASHBOARD (15% LARGER)
      ============================================================ -->
 <section class="slide" id="slide-16">
     <div class="slide-header">
@@ -1768,7 +1641,7 @@
                 <p class="slide-subtitle">12-Plot Diagnostic Suite for All 10 Acquisition Strategies</p>
             </div>
         </div>
-        <div class="slide-number-badge">16 / 18</div>
+        <div class="slide-number-badge">14 / 17</div>
     </div>
 
     <!-- Full-width body with slightly reduced padding for more image space -->
@@ -1799,7 +1672,7 @@
                         <p class="slide-subtitle">Interpreting the Dashboard and Choosing the Right Strategy for the Job</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">17 / 18</div>
+                <div class="slide-number-badge">15 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1833,10 +1706,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>High-Budget Phase Mapping</strong></td>
-                                <td><span class="metric-highlight" style="color: var(--color-cmo);">MultiStart (n=50)</span></td>
-                            </tr>
+                            
                             <tr>
                                 <td><strong>Balanced Production Surrogate</strong></td>
                                 <td><span class="metric-highlight" style="color: var(--color-hybrid);">KMeans Pool (M3)</span></td>
@@ -1845,6 +1715,12 @@
                                 <td><strong>Real-Time Digital Twin Updates</strong></td>
                                 <td><span class="metric-highlight" style="color: var(--color-sobol);">Sobol Grid (M1)</span></td>
                             </tr>
+
+                            <tr>
+                                <td><strong>High-Budget Phase Mapping</strong></td>
+                                <td><span class="metric-highlight" style="color: var(--color-cmo);">MultiStart (n=50)</span></td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
@@ -1864,12 +1740,12 @@
                 <div class="header-left">
                     <img src="images/kit_logo.png" alt="KIT Logo" onerror="this.style.display='none'" style="height:40px;">
                     <div>
-                        <div class="tag-badge">Thesis Summary</div>
+                        <div class="tag-badge">Research Summary</div>
                         <h2 class="slide-title">Scientific Contributions & Future Research</h2>
-                        <p class="slide-subtitle">Impact on High-Performance Crowd Dynamics & Next-Generation HPC Surrogates</p>
+                        <p class="slide-subtitle">Impact on High-Performance Pedestrian Dynamics</p>
                     </div>
                 </div>
-                <div class="slide-number-badge">18 / 18</div>
+                <div class="slide-number-badge">16 / 17</div>
             </div>
 
             <div class="slide-body">
@@ -1877,7 +1753,7 @@
                     <h3 style="font-family: var(--font-mono); font-size: 16px; color: var(--kit-green); margin-bottom: 12px;">CORE SCIENTIFIC CONTRIBUTIONS</h3>
                     <div class="scaffold-card" style="margin-bottom: 10px;">
                         <div class="scaffold-title" style="font-size: 16px;">1. Probabilistic 6D CAFM Surrogate</div>
-                        <div class="scaffold-text" style="font-size: 13px;">Constructed heteroscedastic ARD Matérn 5/2 GP delivering 10,000x evaluation speedup with $R^2 > 0.98$.</div>
+                        <div class="scaffold-text" style="font-size: 13px;">Constructed heteroscedastic ARD Matérn 5/2 GP delivering 1,000x evaluation speedup.</div>
                     </div>
 
                     <div class="scaffold-card" style="margin-bottom: 10px;">
@@ -1893,13 +1769,10 @@
 
                 <div>
                     <h3 style="font-family: var(--font-mono); font-size: 16px; color: var(--color-cmo); margin-bottom: 12px;">FUTURE RESEARCH DIRECTIONS (KIT SCC)</h3>
-                    <div class="scaffold-card" style="margin-bottom: 10px;">
-                        <div class="scaffold-title" style="font-size: 16px;">1. Real-Time Digital Twin Integration</div>
-                        <div class="scaffold-text" style="font-size: 13px;">Deploy GP surrogate onto live camera stream pipelines for real-time pedestrian evacuation prediction.</div>
-                    </div>
+                   
 
                     <div class="scaffold-card" style="margin-bottom: 10px;">
-                        <div class="scaffold-title" style="font-size: 16px;">2. Physics-Informed Gaussian Processes (PIGP)</div>
+                        <div class="scaffold-title" style="font-size: 16px;">1. Physics-Informed Gaussian Processes (PIGP)</div>
                         <div class="scaffold-text" style="font-size: 13px;">Embed momentum conservation & continuity differential constraints directly into covariance kernel.</div>
                     </div>
 
@@ -1912,6 +1785,30 @@
                 <span class="takeaway-text">Active learning turns computationally intractable agent-based dynamics into real-time predictive surrogates for KIT HPC applications.</span>
             </div>
         </section>
+
+        <!-- ============================================================
+     SLIDE 18: THANK YOU
+     ============================================================ -->
+<section class="slide" id="slide-18">
+    <div class="slide-header">
+        <div class="header-left">
+            <img src="images/kit_logo.png" alt="KIT Logo" onerror="this.style.display='none'" style="height:60px;">
+            <div>
+                <div class="tag-badge">Karlsruhe Institute of Technology (KIT) • Scientific Computing Center (SCC)</div>
+                <h1 class="slide-title" style="font-size: 56px;">Thank You</h1>
+                <p class="slide-subtitle" style="font-size: 24px;">Questions & Discussion</p>
+            </div>
+        </div>
+        <div class="slide-number-badge">17 / 17</div>
+    </div>
+
+    <!-- Empty body – just header and footer -->
+    <div class="slide-body" style="grid-template-columns: 1fr; align-items: center; justify-items: center;">
+        <div style="font-size: 80px; opacity: 0.3; text-align: center;">
+            🤔 ❓ 💬
+        </div>
+    </div>
+</section>
 
         <!-- Persistent Footer -->
         <footer id="deck-footer">

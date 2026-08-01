@@ -1,0 +1,4 @@
+Method,Final Data Size,Final R²,Final RMSE,R² Improvement,RMSE Improvement,Total Search Time (s),Total Sim Time (s),Total Fit Time (s),Avg Search/Iter (s),Boundary Points,Interior Points,Boundary %,Avg Max Variance
+M1_Sobol_Grid,305,0.9408,0.6338,+0.0370,+0.1740,2.22,6234.61,8.74,0.44,100,0,100.0%,0.479997
+M2_MultiStart,305,0.9381,0.6479,+0.0343,+0.1599,3.96,5125.08,17.16,0.79,100,0,100.0%,0.781425
+M3_Hybrid,305,0.9359,0.6593,+0.0321,+0.1485,6.00,6213.33,13.16,1.20,100,0,100.0%,0.696607

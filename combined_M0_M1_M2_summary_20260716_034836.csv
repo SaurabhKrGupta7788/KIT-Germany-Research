@@ -1,0 +1,4 @@
+Method,Final Data Size,Final R²,Final RMSE,R² Improvement,RMSE Improvement,Total Search (s),Total Sim (s),Total Fit (s),Total Time (s),Avg Search/Iter,Boundary Points,Interior Points,Boundary %
+M0: Random Baseline,163,0.8137,1.1939,+0.0638,+0.1893,0.0,1660.7,1.1,1661.8,0.01,25,35,41.7%
+M1: Sobol Grid (AL),163,0.8629,1.0242,+0.1130,+0.3590,0.5,2335.3,1.3,2337.0,0.16,60,0,100.0%
+M2: Multi-Start (AL),163,0.8515,1.0660,+0.1015,+0.3173,1.4,1706.3,1.3,1708.9,0.45,60,0,100.0%
