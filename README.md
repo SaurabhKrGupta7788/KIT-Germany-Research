@@ -1,122 +1,103 @@
-# The `animate` LaTeX Package
+﻿# KIT Germany Research: Active Learning & Surrogate Modeling (Ongoing Writing Paper)
 
-© 2007--`\today` Alexander Grahn
+This repository contains the ongoing research code, simulation models, and presentation assets for a study on Active Learning and Surrogate Modeling applied to Conductive Atomic Force Microscopy (CAFM) and 6-dimensional parameter spaces. The project evaluates multiple sampling and optimization techniques against Gaussian Process Regression (GPR) and Bayesian Neural Networks (BNNs).
 
-https://gitlab.com/agrahn/animate
+> **Note:** This project is currently in the "Ongoing writing paper" phase. Code, datasets, and architectures are subject to evolution as the manuscript is finalized.
 
-## Description
+## Architecture Overview
 
-This package provides an interface to create portable, JavaScript driven PDF and SVG animations from sets of (vector) graphics or rasterized image files or from inline (vector) graphics, such as LaTeX-picture, PSTricks or pgf/TikZ generated pictures, or just from typeset text.
+\\\
+Experiment Design & Sampling (6D Input Space)
+    │
+    ▼
+┌────────────────────────────────────────────────────────┐
+│  Sampling Strategies (M0 to M7)                        │
+│  - M0: Random Baseline      - M4: MC Batch             │
+│  - M1: Sobol Grid           - M5: Bayesian Coreset     │
+│  - M2: Multi-Start Hybrid   - M6: Maximal Joint Entropy│
+│  - M3: KMeans Pool          - M7: Trajectory Opt.      │
+└──────────┬─────────────────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────┐      ┌────────────────────────┐
+│  Simulation Engine       │      │  CAFM Simulation       │
+│  (6D Objective Function) │ ──── │  (cafm_sim_v3.py)      │
+└──────────┬───────────────┘      └────────────────────────┘
+           │
+           ▼
+┌────────────────────────────────────────────────────────┐
+│  Surrogate Modeling & Uncertainty Quantification       │
+│  - Gaussian Process Regression (GPR)                   │
+│  - Bayesian Neural Networks (BNN)                      │
+└──────────┬─────────────────────────────────────────────┘
+           │
+           ▼
+┌────────────────────────────────────────────────────────┐
+│  Analysis & Visualization Engine                       │
+│  - HTML Presentation Engine (index.html)               │
+│  - PDF/GIF generation (make_pdf_anim.py, export_*.py)  │
+└────────────────────────────────────────────────────────┘
+\\\
 
-It supports the usual PDF making workflows, i. e.  pdfLaTeX, LaTeX &rArr; `dvips` &rArr; `ps2pdf` (Ghostscript)/Distiller, (Xe)LaTeX &rArr; `(x)dvipdfmx`, LuaLaTeX, and LaTeX &rArr; `dvisvgm` for SVG.
+## System Output
 
-The resulting PDF with animations can be viewed in Acrobat Reader (except on mobile devices), KDE Okular, PDF-XChange, Foxit Reader, PDF.js (Firefox' built-in PDF viewer and extension for Chromium-based browsers).
+The system generates extensive empirical results across all sampling methods, outputting both serialized models and visualizations:
 
-Animated SVG are self-contained files that can be embedded into HTML using the `<object>` tag or opened directly in a Web browser, such as Firefox or Chromium.
+| Method / Output | File Format | Content / Purpose |
+|---|---|---|
+| Method Metrics | \.pkl\ & \.csv\ | e.g., \M5_Bayesian_Coreset_results.pkl\ containing iterations, acquisition scores, and MSE. |
+| Heatmaps & Parity | \.png\ | Partial dependence plots, variance heatmaps, and method comparison charts. |
+| Animations | \.mp4\ / \.gif\ | Animated evolutions of GP fitting and CAFM simulations. |
+| Presentation | \.html\ | A JS-driven interactive slide deck for research presentation. |
 
-Note, this file only gives a summary of usage and available package and command options. Please refer to the documentation [`animate.pdf`](http://mirrors.ctan.org/macros/latex/contrib/animate/animate.pdf) for details and examples.
+## Directory Structure
 
-*Keywords:* include portable PDF animation SVG animation animated PDF animated SVG dvisvgm html TeX4ht web animating embed animated graphics LaTeX pdfLaTeX LuaLaTeX PSTricks pgf TikZ LaTeX-picture MetaPost inline graphics vector graphics animated GIF LaTeX dvips ps2pdf dvipdfmx XeLaTeX JavaScript Acrobat Reader KDE Okular PDF-XChange Foxit Reader PDF.js Firefox Chrome Chromium
+\\\
+├── 6d_GP_randomVSoptimizer.ipynb   # 6D GPR active learning comparisons
+├── BNN_code.ipynb                  # Bayesian Neural Network implementations
+├── cafm_sim_v3.py                  # Core CAFM simulator
+├── uq_analysis.py                  # Uncertainty Quantification analysis
+├── lhs_generator.py                # Latin Hypercube Sampling tools
+│
+├── html_presentation/              # Custom HTML/JS slide rendering engine
+│   └── index.html                  # Main presentation deck
+│
+├── *.pkl / *.csv                   # Serialized ML runs (M0 to M7 outputs)
+├── *.png / *.mp4                   # Visual outputs and animations
+│
+├── README.md                       # Research architecture documentation
+└── PROJECT.md                      # UI/Presentation deck milestones
+\\\
 
-## Usage
+## How to Run
 
-````latex
-\usepackage[<package options>]{animate}
-````
+### 1. Prerequisites
+- Python 3.10+
+- Jupyter Notebook / Lab
+- Scientific libraries: \scikit-learn\, \GPyTorch\/\PyTorch\, \
+umpy\, \matplotlib\
+- LaTeX (for \nimate\ package PDF generation)
 
-- **Package options:**
+### 2. Install Dependencies
 
-````
-width=<h-size>, height=<v-size>, totalheight=<v-size>,
-keepaspectratio, scale=<factor>,
-bb=<llx> <lly> <urx> <ury>,
-viewport=<llx> <lly> <urx> <ury>,
-trim=<left> <bottom> <right> <top>,
-hiresbb, pagebox=..., interpolate,
-type=[<file ext>],
-final, draft, nomouse,
-autopause, autoplay, autoresume,
-controls[=all | none | ...],
-controlsaligned=left[+<indent>] | center | right[+<indent>],
-buttonsize=<size>,
-buttonbg=<colour>, buttonfg=<colour>, buttonalpha=<opacity>,
-loop, palindrome, step,
-poster[=first | <num> | last | none],
-alttext=none | {<alternative description>},
-method=icon | widget | ocg,
-dvipdfmx, dvisvgm, xetex,
-export
-````
+\\\ash
+# (Assuming a standard data science environment)
+pip install numpy pandas scikit-learn torch gpytorch matplotlib seaborn
+\\\
 
-- **User interface:**
+### 3. Run the Experiments
+1. **Surrogate Modeling**: Open and run \6d_GP_randomVSoptimizer.ipynb\ to execute the comparative active learning loop.
+2. **CAFM Simulation**: Run the simulation scripts directly to generate spatial data:
+   \\\ash
+   python cafm_sim_v3.py
+   \\\
+3. **Visualization**: Run \export_cafm_gif.py\ or \make_pdf_anim.py\ to generate the figures for the paper.
 
-````latex
-\animategraphics[<options>]{<frame rate>}{<file basename>}{<first>}{<last>}
+### 4. View Presentation
+Open \html_presentation/index.html\ in any modern web browser to view the interactive research presentation.
 
-\begin{animateinline}[<options>]{<frame rate>}
-    ... typeset material ...
-\newframe[<frame rate>]
-    ... typeset material ...
-\newframe*[<frame rate>]
-    ... typeset material ...
-\newframe
-\multiframe{<number of frames>}{[<variables>]}{
-    ... repeated (parameterized) material ...
-    \multiframebreak % optional !
-}
-\end{animateinline}
-````
+## Key Design Decisions
 
-- **Command options:**
-
-````
-width=<h-size>, height=<v-size>, totalheight=<v-size>,
-keepaspectratio, scale=<factor>,
-bb=<llx> <lly> <urx> <ury>,
-viewport=<llx> <lly> <urx> <ury>,
-trim=<left> <bottom> <right> <top>,
-hiresbb, pagebox=..., interpolate,
-type=[<file ext>],
-final, draft, nomouse,
-autopause, autoplay, autoresume,
-controls[=all | none | ...],
-controlsaligned=left[+<indent>] | center | right[+<indent>],
-buttonsize=<size>,
-buttonbg=<colour>, buttonfg=<colour>, buttonalpha=<opacity>,
-loop, palindrome, step,
-measure,
-poster[=first | <num> | last | none],
-alttext=none | {<alternative description>},
-begin={<begin text>}, end={<end text>},
-timeline=<timeline file>,
-method=icon | widget | ocg,
-every=<number>, label=<label text>
-````
-
-## Requirements
-
-Recent versions of
-- Ghostscript or Adobe Distiller
-- dvipdfmx
-- dvisvgm
-- PDF: Acrobat Reader, KDE Okular, PDF-XChange, Foxit Reader, PDF.js, Firefox
-- SVG: Blink-based web browsers (Chromium, Chrome, Opera, ...) or Firefox
-
-## Installation
-
-Unzip the file
-[`animate.tds.zip`](http://mirrors.ctan.org/install/macros/latex/contrib/animate.tds.zip) into the local TDS root directory which can be found by running
-
-````bash
-kpsewhich -var-value TEXMFLOCAL
-````
-
-on the command line.
-
-After installation, update the filename database by running `texhash` on the command line.
-
-TeXLive and MiKTeX users should run the package manager for installation.
-
-## License
-
-This material is subject to the [LaTeX Project Public License](http://mirrors.ctan.org/macros/latex/base/lppl.txt).
+1. **Active Learning Benchmarking**: Implementing 8 distinct sampling techniques (M0-M7) allows rigorous, empirically sound comparison for surrogate model convergence on computationally expensive simulations.
+2. **Multi-Model Uncertainty**: Using both GPR and BNNs ensures that uncertainty quantification (UQ) isn't biased by a single algorithm's prior assumptions, crucial for robust 6D optimization.
+3. **Web-Native Presentation**: Instead of PowerPoint, the research deck is built as an HTML/JS engine (\index.html\), enabling flawless embedding of SVG animations, interactive parameter plots, and high-DPI scientific visuals directly connected to the Python output directories.
